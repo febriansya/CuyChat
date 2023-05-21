@@ -7,5 +7,6 @@ This project for learning build chat app use jetpack comopse and firebase
 
 ## Design From Figma Community
 <p float="left">
-  <img width="30%" height="50%" src="https://github.com/piashcse/Hilt-MVVM-Compose-Movie/blob/master/screenshots/Screenshot_20220420_022455.png" />
+  <img width="30%" height="50%" src="https://github.com/febriansya/CuyChat/blob/7814cb915ce8addd541dac7dd5fd709d61efcdfc/chat_design.png" />
 </p>
+
