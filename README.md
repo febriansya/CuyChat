@@ -6,4 +6,6 @@ This project for learning build chat app use jetpack comopse and firebase
 # CuyChat (Jetpack comopse + Firebase + MVVM)
 
 ## Design From Figma Community
-![Gambar 1] (https://github.com/febriansya/CuyChat/blob/master/design%20chat.png?raw=true)
+<p float="left">
+  <img width="30%" height="50%" src="https://github.com/piashcse/Hilt-MVVM-Compose-Movie/blob/master/screenshots/Screenshot_20220420_022455.png" />
+</p>
