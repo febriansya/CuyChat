@@ -17,7 +17,9 @@ class RegisterUseCase(
     ): Flow<Resources<User>> = flow {
         try {
             emit(Resources.Loading<User>())
-            val user = repository.register(username, email, password)
+            val user = repository.register(username, email, password){
+
+            }
             emit(Resources.Success<User>(user))
         } catch (exception: Exception) {
             emit(
