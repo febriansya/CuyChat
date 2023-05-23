@@ -9,4 +9,6 @@ interface ChatRepository {
         password: String,
         uiState: (UiState) -> Unit
     )
+
+    fun login(email: String, password: String, uiState: (UiState) -> Unit)
 }

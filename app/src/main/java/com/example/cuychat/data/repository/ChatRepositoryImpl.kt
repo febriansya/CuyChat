@@ -36,14 +36,26 @@ class ChatRepositoryImpl @Inject constructor(
 //        }
 
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+            uiState.invoke(UiState.Loading)
             if (task.isSuccessful) {
                 uiState.invoke(UiState.Success("Register Successfully"))
-            }else{
-                uiState.invoke(UiState.Success("Email not verified"))
+            } else {
+                uiState.invoke(UiState.Failure("Register Failed"))
             }
-        }.addOnFailureListener {
-            uiState.invoke(UiState.Failure("Failed Register"))
         }
+    }
 
+    override fun login(email: String, password: String, uiState: (UiState) -> Unit) {
+        uiState.invoke(UiState.Loading)
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    uiState.invoke(UiState.Success("Login Berhasil"))
+                } else {
+                    uiState.invoke(UiState.Failure("Email or Password wronng"))
+                }
+            }.addOnFailureListener {
+                uiState.invoke(UiState.Failure("Gagal Login"))
+            }
     }
 }

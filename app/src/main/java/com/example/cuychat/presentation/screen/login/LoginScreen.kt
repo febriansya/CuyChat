@@ -1,6 +1,7 @@
 package com.example.cuychat.presentation.screen.login
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -12,7 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -32,30 +35,44 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.cuychat.R
+import com.example.cuychat.common.UiState
 import com.example.cuychat.navigation.Screen
 import com.example.cuychat.ui.theme.Black
 import com.example.cuychat.ui.theme.DarkGrey
 import com.example.cuychat.ui.theme.TextTypografy
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    navController: NavController
+    loginViewModel: LoginViewModel,
+    navController: NavController,
+    navigateToHome: () -> Unit
 ) {
+
+    var isButtonTouched by remember { mutableStateOf(false) }
+
+    val state = loginViewModel.uiState
 
     var usernameText by remember { mutableStateOf(TextFieldValue("")) }
     var passwordText by remember { mutableStateOf(TextFieldValue("")) }
+
+    var snackbarVisible by remember { mutableStateOf(false) }
+    var snackbarMessage by remember { mutableStateOf("") }
+
 
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
             .background(Black)
     ) {
-        val (username, password, column, bgBottom, bottomLogin, register) = createRefs()
+        val (username, password, column, bgBottom, bottomLogin, register, loadingCircular) = createRefs()
         Column(
             modifier = Modifier
                 .constrainAs(column) {
@@ -127,7 +144,18 @@ fun LoginScreen(
 
         Button(
             onClick = {
-                navController.navigate(Screen.Message.route)
+                val username = usernameText.text.trim()
+                val password = passwordText.text.trim()
+                if (username.isNotEmpty() && password.isNotEmpty()) {
+                    loginViewModel.viewModelScope.launch(Dispatchers.IO) {
+                        loginViewModel.signIn(usernameText.text, passwordText.text)
+                        isButtonTouched = true
+                    }
+                } else {
+                    snackbarMessage = "Please complete the input field"
+                    snackbarVisible = true
+                }
+
             },
             modifier = Modifier.constrainAs(bottomLogin) {
                 top.linkTo(column.bottom, margin = 12.dp)
@@ -162,8 +190,6 @@ fun LoginScreen(
             )
         }
 
-
-
         Image(
             modifier = Modifier
                 .constrainAs(bgBottom) {
@@ -176,12 +202,44 @@ fun LoginScreen(
             painter = painterResource(id = R.drawable.bg_gradient_login),
             contentDescription = "background"
         )
+        if (isButtonTouched) {
+            when (state) {
+                is UiState.Loading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.constrainAs(loadingCircular) {
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                        }
+                    )
+                }
+
+                is UiState.Success -> {
+                    Snackbar() {
+                        Text(text = "succcess Login")
+                    }
+                    navigateToHome()
+                }
+
+                is UiState.Failure -> {
+                    Snackbar() {
+                        Text(text = "failed Login")
+                    }
+                }
+            }
+        }
+    }
+    if (snackbarVisible) {
+        Snackbar(
+            action = {
+                // Optionally, you can add an action to the Snackbar
+                TextButton(onClick = { snackbarVisible = false }) {
+                    Text(text = "Dismiss")
+                }
+            }
+        ) {
+            Text(text = snackbarMessage)
+        }
     }
 }
-
-
-//@Preview(showBackground = true)
-//@Composable
-//fun ShowingLoginPreview() {
-//    LoginScreen()
-//}

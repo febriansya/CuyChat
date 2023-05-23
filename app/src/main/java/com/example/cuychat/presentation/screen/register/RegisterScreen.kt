@@ -5,11 +5,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ScaffoldState
@@ -38,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.isPopupLayout
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -58,12 +61,24 @@ fun RegisterScreen(
     navController: NavController
 ) {
 
+    var isButtonTouched by remember { mutableStateOf(false) }
+
+
     var usernameText by remember { mutableStateOf(TextFieldValue("")) }
     var passwordText by remember { mutableStateOf(TextFieldValue("")) }
     var emailText by remember { mutableStateOf(TextFieldValue("")) }
 
     var isLoading = false
     val uiState by registerViewModel.uiState
+    val state = registerViewModel.uiStater
+
+
+    var snackbarVisible by remember { mutableStateOf(false) }
+    var snackbarSuccess by remember { mutableStateOf(false) }
+    var snackbarError by remember { mutableStateOf(false) }
+
+    var snackbarMessage by remember { mutableStateOf("") }
+
 
     ConstraintLayout(
         modifier = Modifier
@@ -137,9 +152,7 @@ fun RegisterScreen(
                 )
             )
 
-
             Spacer(modifier = Modifier.height(38.dp))
-
 //            password
             TextField(
                 modifier = Modifier
@@ -170,15 +183,24 @@ fun RegisterScreen(
 
         Button(
             onClick = {
-                registerViewModel.viewModelScope.launch(Dispatchers.IO) {
-                    registerViewModel.registerUser(
-                        usernameText.text,
-                        emailText.text,
-                        passwordText.text
-                    )
-
-
+                val username = usernameText.text.trim()
+                val password = passwordText.text.trim()
+                val email = emailText.text.trim()
+                if (username.isNotEmpty() && password.isNotEmpty() && email.isNotEmpty()) {
+                    registerViewModel.viewModelScope.launch(Dispatchers.IO) {
+                        registerViewModel.registerUser(
+                            usernameText.text,
+                            emailText.text,
+                            passwordText.text
+                        )
+                        isButtonTouched = true
+                    }
+                } else {
+                    snackbarMessage = "Please complete the all input field"
+                    snackbarVisible = true
                 }
+
+
             },
             modifier = Modifier.constrainAs(bottomLogin) {
                 top.linkTo(column.bottom, margin = 12.dp)
@@ -226,5 +248,64 @@ fun RegisterScreen(
             contentDescription = "background"
         )
 
+        if (isButtonTouched) {
+            when (state) {
+                is UiState.Loading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.constrainAs(loadingCircular) {
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                        }
+                    )
+                }
+
+                is UiState.Success -> {
+                    if (!snackbarSuccess) {
+                        Snackbar(
+                            action = {
+                                TextButton(onClick = { snackbarSuccess = true }) {
+                                    Text(text = "Dismiss")
+                                }
+                            }
+                        ) {
+                            Text(text = "succcess register")
+                        }
+                    }
+
+                    navController.navigate(Screen.Login.route) {
+                        launchSingleTop = true
+                    }
+                }
+
+                is UiState.Failure -> {
+                    if (!snackbarError) {
+                        Snackbar(
+                            action = {
+                                TextButton(onClick = { snackbarError = true }) {
+                                    Text(text = "Dismiss")
+                                }
+                            }
+                        ) {
+                            Text(text = "failed register")
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+    if (snackbarVisible) {
+        Snackbar(
+            action = {
+                // Optionally, you can add an action to the Snackbar
+                TextButton(onClick = { snackbarVisible = false }) {
+                    Text(text = "Dismiss")
+                }
+            }
+        ) {
+            Text(text = snackbarMessage)
+        }
     }
 }

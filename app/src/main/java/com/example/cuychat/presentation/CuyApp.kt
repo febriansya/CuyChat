@@ -35,6 +35,7 @@ import com.example.cuychat.presentation.screen.camera.CameraScreen
 import com.example.cuychat.presentation.screen.chat.DetailChatScreen
 import com.example.cuychat.presentation.screen.chat.HomeScreen
 import com.example.cuychat.presentation.screen.login.LoginScreen
+import com.example.cuychat.presentation.screen.login.LoginViewModel
 import com.example.cuychat.presentation.screen.register.RegisterScreen
 import com.example.cuychat.presentation.screen.register.RegisterViewModel
 import com.example.cuychat.presentation.screen.settings.SettingsScreen
@@ -48,7 +49,8 @@ import dagger.hilt.android.AndroidEntryPoint
 @Composable
 fun CuyApp(
     navHostController: NavHostController = rememberNavController(),
-    registerViewModel: RegisterViewModel = hiltViewModel()
+    registerViewModel: RegisterViewModel = hiltViewModel(),
+    loginViewModel: LoginViewModel = hiltViewModel()
 ) {
     val navBackStackEntry by navHostController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -87,9 +89,12 @@ fun CuyApp(
             }
 
             composable(Screen.Login.route) {
-                LoginScreen(navController = navHostController)
+                LoginScreen(navController = navHostController, loginViewModel = loginViewModel) {
+                    navHostController.navigate(Screen.Message.route){
+                        launchSingleTop = true
+                    }
+                }
             }
-
         }
     }
 }
