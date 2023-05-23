@@ -41,6 +41,7 @@ import com.example.cuychat.presentation.screen.register.RegisterViewModel
 import com.example.cuychat.presentation.screen.settings.SettingsScreen
 import com.example.cuychat.ui.theme.DarkGrey
 import com.example.cuychat.ui.theme.Purple
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -50,7 +51,8 @@ import dagger.hilt.android.AndroidEntryPoint
 fun CuyApp(
     navHostController: NavHostController = rememberNavController(),
     registerViewModel: RegisterViewModel = hiltViewModel(),
-    loginViewModel: LoginViewModel = hiltViewModel()
+    loginViewModel: LoginViewModel = hiltViewModel(),
+    auth: FirebaseAuth = FirebaseAuth.getInstance()
 ) {
     val navBackStackEntry by navHostController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -89,9 +91,24 @@ fun CuyApp(
             }
 
             composable(Screen.Login.route) {
-                LoginScreen(navController = navHostController, loginViewModel = loginViewModel) {
-                    navHostController.navigate(Screen.Message.route){
+                if (auth.currentUser != null) {
+                    navHostController.navigate(Screen.Message.route) {
                         launchSingleTop = true
+                        popUpTo(Screen.Login.route) {
+                            inclusive = true
+                        }
+                    }
+                } else {
+                    LoginScreen(
+                        navController = navHostController,
+                        loginViewModel = loginViewModel
+                    ) {
+                        navHostController.navigate(Screen.Message.route) {
+                            launchSingleTop = true
+                            popUpTo(Screen.Login.route) {
+                                inclusive = true
+                            }
+                        }
                     }
                 }
             }

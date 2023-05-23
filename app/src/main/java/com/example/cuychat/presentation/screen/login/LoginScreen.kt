@@ -43,6 +43,7 @@ import com.example.cuychat.navigation.Screen
 import com.example.cuychat.ui.theme.Black
 import com.example.cuychat.ui.theme.DarkGrey
 import com.example.cuychat.ui.theme.TextTypografy
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -55,7 +56,6 @@ fun LoginScreen(
     navController: NavController,
     navigateToHome: () -> Unit
 ) {
-
     var isButtonTouched by remember { mutableStateOf(false) }
 
     val state = loginViewModel.uiState
@@ -65,6 +65,8 @@ fun LoginScreen(
 
     var snackbarVisible by remember { mutableStateOf(false) }
     var snackbarMessage by remember { mutableStateOf("") }
+
+
 
 
     ConstraintLayout(

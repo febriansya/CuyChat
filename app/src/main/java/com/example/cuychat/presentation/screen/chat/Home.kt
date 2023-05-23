@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.cuychat.R
 import com.example.cuychat.presentation.components.CurrentActive
@@ -60,7 +61,11 @@ fun HomeScreen(
             verticalAlignment = Alignment.CenterVertically
 
         ) {
-            Text(text = "Messagges", color = LinearColor, style = TextTypografy.titleMedium)
+            Text(
+                text = "Messagges", color = LinearColor, style = TextTypografy.titleMedium.copy(
+                    fontSize = 18.sp
+                )
+            )
             IconButton(onClick = { /*TODO*/ }) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_filter),

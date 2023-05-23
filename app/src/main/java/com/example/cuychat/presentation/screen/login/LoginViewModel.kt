@@ -19,7 +19,6 @@ class LoginViewModel @Inject constructor(
     var uiState by mutableStateOf<UiState>(UiState.Loading)
         private set
 
-
     fun signIn(email: String, password: String) {
         viewModelScope.launch {
             repository.login(email, password) {

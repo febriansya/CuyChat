@@ -42,6 +42,4 @@ object AppModule {
     fun provideMainUseCases(repository: ChatRepository): MainUseCase {
         return MainUseCase(RegisterUseCase(repository))
     }
-
-
 }

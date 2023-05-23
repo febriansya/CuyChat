@@ -46,6 +46,7 @@ fun SearchWidget(
             Text(
                 "Search...", style = TextTypografy.titleMedium.copy(
                     color = Color.White,
+                    fontSize = 20.sp
                 )
             )
         },
