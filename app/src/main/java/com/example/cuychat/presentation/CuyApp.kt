@@ -27,6 +27,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
 import com.example.cuychat.R
 import com.example.cuychat.navigation.NavigationItem
 import com.example.cuychat.navigation.Screen
@@ -43,6 +44,8 @@ import com.example.cuychat.ui.theme.DarkGrey
 import com.example.cuychat.ui.theme.Purple
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -52,16 +55,17 @@ fun CuyApp(
     navHostController: NavHostController = rememberNavController(),
     registerViewModel: RegisterViewModel = hiltViewModel(),
     loginViewModel: LoginViewModel = hiltViewModel(),
-    auth: FirebaseAuth = FirebaseAuth.getInstance()
+    auth: FirebaseAuth = FirebaseAuth.getInstance(),
 ) {
+
+
     val navBackStackEntry by navHostController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     Scaffold(bottomBar = {
         if (currentRoute != Screen.Detail.route && currentRoute != Screen.Register.route && currentRoute != Screen.Login.route) {
             BottomBar(navHostController)
         }
-    })
-    {
+    }) {
         NavHost(
             navController = navHostController,
             startDestination = Screen.Login.route,
@@ -78,19 +82,32 @@ fun CuyApp(
             }
 
             composable(Screen.Settings.route) {
-                SettingsScreen(navHostController)
+                SettingsScreen(navHostController) {
+                    val current = auth.currentUser
+                    if (current != null) {
+                        auth.signOut()
+                        navHostController.navigate(Screen.Login.route) {
+                            launchSingleTop = true
+                            popUpTo(Screen.Login.route) {
+                                inclusive = true
+                            }
+                            popUpTo(Screen.Message.route) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                }
             }
-
             composable(Screen.Detail.route) {
                 DetailChatScreen()
 //                LoginScreen(navHostController)
             }
-
             composable(Screen.Register.route) {
                 RegisterScreen(registerViewModel, navHostController)
             }
 
             composable(Screen.Login.route) {
+//                if user have login preveus
                 if (auth.currentUser != null) {
                     navHostController.navigate(Screen.Message.route) {
                         launchSingleTop = true
@@ -100,14 +117,10 @@ fun CuyApp(
                     }
                 } else {
                     LoginScreen(
-                        navController = navHostController,
-                        loginViewModel = loginViewModel
+                        navController = navHostController, loginViewModel = loginViewModel
                     ) {
                         navHostController.navigate(Screen.Message.route) {
                             launchSingleTop = true
-                            popUpTo(Screen.Login.route) {
-                                inclusive = true
-                            }
                         }
                     }
                 }
@@ -191,7 +204,6 @@ fun BottomBar(
         }
     }
 }
-
 
 
 

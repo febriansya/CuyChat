@@ -1,12 +1,10 @@
 package com.example.cuychat.data.repository
 
-import android.util.Log
 import com.example.cuychat.common.UiState
-import com.example.cuychat.data.source.remote.dto.User
+import com.example.cuychat.domain.model.UserProfile
 import com.example.cuychat.domain.repository.ChatRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class ChatRepositoryImpl @Inject constructor(
@@ -19,26 +17,17 @@ class ChatRepositoryImpl @Inject constructor(
         password: String,
         uiState: (UiState) -> Unit
     ) {
-//        try {
-//            val authResult = auth.createUserWithEmailAndPassword(email, password).await()
-//            Log.d("register", "register success")
-//            val userId = authResult.user?.uid
-//            if (userId != null) {
-//                val userRef = database.reference.child("users").child(userId)
-//                val user = User(username, email)
-//                userRef.setValue(user).await()
-//                Log.d("register", "register success")
-//            } else {
-//                Log.d("register", "register failed")
-//            }
-//        } catch (exception: Exception) {
-//            Log.d("exception", exception.toString())
-//        }
-
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             uiState.invoke(UiState.Loading)
             if (task.isSuccessful) {
                 uiState.invoke(UiState.Success("Register Successfully"))
+                val user = auth.currentUser?.uid
+                val userRef = database.reference.child("users").child(user.toString())
+                val userPofile = UserProfile(
+                    user.toString(),
+                    username = username,
+                )
+                userRef.setValue(userPofile)
             } else {
                 uiState.invoke(UiState.Failure("Register Failed"))
             }
@@ -59,3 +48,5 @@ class ChatRepositoryImpl @Inject constructor(
             }
     }
 }
+
+

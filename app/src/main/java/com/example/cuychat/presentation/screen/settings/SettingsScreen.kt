@@ -14,7 +14,8 @@ import com.example.cuychat.navigation.Screen
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SettingsScreen(
-    navController: NavController
+    navController: NavController,
+    logout: () -> Unit
 ) {
 
 
@@ -31,9 +32,9 @@ fun SettingsScreen(
         },
 
             onClick = {
-                navController.navigate(Screen.Login.route)
+                logout()
             }) {
-            Text(text = "login")
+            Text(text = "logout")
         }
     }
 
