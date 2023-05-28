@@ -11,4 +11,6 @@ interface ChatRepository {
     )
 
     fun login(email: String, password: String, uiState: (UiState) -> Unit)
+
+    suspend fun sendMessage(senderId: String, receivedId: String, message: String,uiState: (UiState) -> Unit)
 }

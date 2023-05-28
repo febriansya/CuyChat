@@ -47,6 +47,28 @@ class ChatRepositoryImpl @Inject constructor(
                 uiState.invoke(UiState.Failure("Gagal Login"))
             }
     }
+
+    override suspend fun sendMessage(
+        senderId: String,
+        receivedId: String,
+        message: String,
+        uiState: (UiState) -> Unit
+    ) {
+        val databaseReference = database.getReference("messages")
+        val messageRef = databaseReference.push()
+        val messageData = mapOf(
+            "senderId" to senderId,
+            "receiveId" to receivedId,
+            "message" to message
+        )
+        messageRef.setValue(messageData).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                uiState.invoke(UiState.Success("Message send"))
+            } else {
+                uiState.invoke(UiState.Failure("Cant send Message"))
+            }
+        }
+    }
 }
 
 

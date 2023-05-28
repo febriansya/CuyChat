@@ -90,7 +90,9 @@ fun RecentMessage(
             items(image.size) { pesann ->
                 ItemRecentMessage(image[pesann], name[pesann], pesan[pesann]) {
                     Log.d("tes", Screen.Detail.route)
-                    navController.navigate(Screen.Detail.route)
+                    navController.navigate(Screen.Detail.route){
+                        launchSingleTop = true
+                    }
                 }
             }
         }

@@ -27,7 +27,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navigation
 import com.example.cuychat.R
 import com.example.cuychat.navigation.NavigationItem
 import com.example.cuychat.navigation.Screen
@@ -43,9 +42,6 @@ import com.example.cuychat.presentation.screen.settings.SettingsScreen
 import com.example.cuychat.ui.theme.DarkGrey
 import com.example.cuychat.ui.theme.Purple
 import com.google.firebase.auth.FirebaseAuth
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

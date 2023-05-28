@@ -14,8 +14,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -31,13 +37,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.isPopupLayout
@@ -78,6 +88,8 @@ fun RegisterScreen(
     var snackbarError by remember { mutableStateOf(false) }
 
     var snackbarMessage by remember { mutableStateOf("") }
+
+    var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
 
     ConstraintLayout(
@@ -130,7 +142,21 @@ fun RegisterScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 32.dp, end = 30.dp),
+
+                trailingIcon = {
+                    val image = if (passwordVisible)
+                        Icons.Filled.Visibility
+                    else Icons.Filled.VisibilityOff
+
+                    val description = if (passwordVisible) "hidePassword" else "show password"
+                    IconButton(onClick = { passwordVisible = !passwordVisible}) {
+                        Icon(imageVector = image, description)
+                    }
+                },
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 value = passwordText,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                maxLines = 1,
                 onValueChange = { passwordText = it },
                 placeholder = {
                     Text(
@@ -140,6 +166,7 @@ fun RegisterScreen(
                         )
                     )
                 },
+
                 singleLine = true,
                 shape = RoundedCornerShape(16.dp),
                 colors = TextFieldDefaults.textFieldColors(
@@ -273,10 +300,7 @@ fun RegisterScreen(
                             Text(text = "succcess register")
                         }
                     }
-
-                    navController.navigate(Screen.Login.route) {
-                        launchSingleTop = true
-                    }
+                    navController.navigate(Screen.Login.route)
                 }
 
                 is UiState.Failure -> {

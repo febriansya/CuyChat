@@ -23,7 +23,6 @@ class RegisterViewModel @Inject constructor(
 
     var uiStater by mutableStateOf<UiState>(UiState.Loading)
         private set
-
     fun registerUser(username: String, email: String, password: String) {
         viewModelScope.launch {
             repository.register(username, email, password) {

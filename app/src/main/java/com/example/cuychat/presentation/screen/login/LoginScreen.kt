@@ -152,6 +152,7 @@ fun LoginScreen(
                 value = passwordText,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                maxLines = 1,
                 onValueChange = { passwordText = it },
                 placeholder = {
                     Text(
